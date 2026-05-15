@@ -3,7 +3,8 @@
 # ---------------------------------------------------------------------------------------------------------------------
 variable "domain" {
   type        = string
-  description = "(Required) - The DNS Domain (only domain, not sub domain) for Cloudfront."
+  description = "(Optional/Legacy) - The DNS Domain (only domain, not sub domain) for Cloudfront. This value is kept for backwards compatibility and is not used by the distribution resource."
+  default     = null
 }
 variable "aliases" {
   type        = list(string)
@@ -24,7 +25,8 @@ variable "enabled" {
 }
 variable "allowed_methods" {
   type        = list(string)
-  description = "(Required) - Controls which HTTP methods CloudFront processes and forwards to your Amazon S3 bucket or your custom origin."
+  description = "(Optional/Legacy) - Controls which HTTP methods CloudFront processes and forwards to your custom origin. Prefer default_cache_behavior.allowed_methods for new usages."
+  default     = null
 
   #
   # Examples:
@@ -34,7 +36,8 @@ variable "allowed_methods" {
 }
 variable "cached_methods" {
   type        = list(string)
-  description = "(Required) - Controls whether CloudFront caches the response to requests using the specified HTTP methods."
+  description = "(Optional/Legacy) - Controls whether CloudFront caches the response to requests using the specified HTTP methods. Prefer default_cache_behavior.cached_methods for new usages."
+  default     = null
 
   #
   # Examples:
@@ -48,7 +51,100 @@ variable "acm_certificate_arn" {
 }
 variable "target_origin_id" {
   type        = string
-  description = " (Required) - The value of ID for the origin that you want CloudFront to route requests to when a request matches the path pattern either for a cache behavior or for the default cache behavior."
+  description = "(Optional/Legacy) - The origin ID used by the default cache behavior and, when origin is not set, also used as the origin domain name. Prefer origin[*].origin_id and default_cache_behavior.target_origin_id for new usages."
+  default     = null
+}
+variable "origin" {
+  type = list(object({
+    domain_name              = string
+    origin_id                = string
+    origin_path              = optional(string, "")
+    connection_attempts      = optional(number, 3)
+    connection_timeout       = optional(number, 10)
+    origin_access_control_id = optional(string)
+    custom_header = optional(list(object({
+      name  = string
+      value = string
+    })), [])
+    custom_origin_config = optional(object({
+      http_port                = optional(number, 80)
+      https_port               = optional(number, 443)
+      origin_protocol_policy   = optional(string, "match-viewer")
+      origin_ssl_protocols     = optional(list(string), ["TLSv1.2"])
+      origin_keepalive_timeout = optional(number)
+      origin_read_timeout      = optional(number)
+    }))
+  }))
+  description = "(Optional) - Origins for this CloudFront distribution. Use this argument for the modern module interface. If omitted, a legacy origin is built from target_origin_id and origin_* variables."
+  default     = []
+
+  validation {
+    condition = alltrue([
+      for item in var.origin : try(
+        item.custom_origin_config.origin_protocol_policy == null ||
+        contains(["http-only", "https-only", "match-viewer"], item.custom_origin_config.origin_protocol_policy),
+        true
+      )
+    ])
+    error_message = "origin[*].custom_origin_config.origin_protocol_policy can be [http-only | https-only | match-viewer]"
+  }
+
+  validation {
+    condition = alltrue(flatten([
+      for item in var.origin : (
+        item.custom_origin_config == null ? [true] : [
+          for protocol in item.custom_origin_config.origin_ssl_protocols :
+          contains(["SSLv3", "TLSv1", "TLSv1.1", "TLSv1.2"], protocol)
+        ]
+      )
+    ]))
+    error_message = "origin[*].custom_origin_config.origin_ssl_protocols can contain only [SSLv3 | TLSv1 | TLSv1.1 | TLSv1.2]"
+  }
+}
+variable "default_cache_behavior" {
+  type = object({
+    allowed_methods            = optional(list(string))
+    cached_methods             = optional(list(string))
+    target_origin_id           = optional(string)
+    viewer_protocol_policy     = optional(string)
+    compress                   = optional(bool)
+    cache_policy_id            = optional(string)
+    origin_request_policy_id   = optional(string)
+    response_headers_policy_id = optional(string)
+    min_ttl                    = optional(number)
+    default_ttl                = optional(number)
+    max_ttl                    = optional(number)
+    smooth_streaming           = optional(bool)
+    trusted_key_groups         = optional(list(string))
+    trusted_signers            = optional(list(string))
+    field_level_encryption_id  = optional(string)
+    realtime_log_config_arn    = optional(string)
+    forwarded_values = optional(object({
+      query_string            = optional(bool)
+      query_string_cache_keys = optional(list(string))
+      headers                 = optional(list(string))
+      cookies = optional(object({
+        forward           = string
+        whitelisted_names = optional(list(string))
+      }))
+    }))
+  })
+  description = "(Optional) - Default cache behavior for the distribution. This is the recommended interface for new usages and maps to aws_cloudfront_distribution.default_cache_behavior."
+  default     = null
+
+  validation {
+    condition = try(
+      var.default_cache_behavior.viewer_protocol_policy == null ||
+      contains(["allow-all", "https-only", "redirect-to-https"], var.default_cache_behavior.viewer_protocol_policy),
+      true
+    )
+    error_message = "default_cache_behavior.viewer_protocol_policy can be [allow-all | https-only | redirect-to-https]"
+  }
+}
+variable "response_headers_policy_id" {
+  type        = string
+  description = "(Optional) - Response headers policy ID to attach to the default cache behavior. default_cache_behavior.response_headers_policy_id has precedence when both are set."
+  default     = null
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
