@@ -108,6 +108,16 @@ variable "iam_profile" {
   description = "Profile IAM (Role)"
   default     = ""
 }
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) IMDS options for the EC2 instance. Set to null to omit the block."
+  default     = {}
+}
 variable "encrypted" {
   type        = bool
   description = "(Optional) Whether to enable volume encryption. Defaults to false."

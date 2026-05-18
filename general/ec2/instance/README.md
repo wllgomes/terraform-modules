@@ -28,6 +28,29 @@ module "SampleEC2" {
 ```
 <br>
 
+### Customizando `metadata_options`
+
+O módulo habilita IMDSv2 por padrão. Se necessário, os consumidores podem sobrescrever esse comportamento:
+
+```bash
+module "SampleEC2" {
+  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/ec2/instance"
+  ec2_name           = ""
+  ami                = ""
+  ec2_type           = ""
+  security_group_ids = []
+  subnet_id          = ""
+  volume_size        = ""
+
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
+  }
+}
+```
+
 ## References
 - https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
 <br>
