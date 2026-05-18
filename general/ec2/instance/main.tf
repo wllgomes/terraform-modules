@@ -1,4 +1,15 @@
 # EC2 instance
+locals {
+  default_metadata_options = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  }
+
+  metadata_options = merge(local.default_metadata_options, var.metadata_options)
+}
+
 resource "aws_instance" "this" {
   ami                         = var.ami
   instance_type               = var.instance_type
@@ -13,10 +24,10 @@ resource "aws_instance" "this" {
   iam_instance_profile        = var.iam_profile
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 1
-    instance_metadata_tags      = "enabled"
+    http_endpoint               = local.metadata_options.http_endpoint
+    http_tokens                 = local.metadata_options.http_tokens
+    http_put_response_hop_limit = local.metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = local.metadata_options.instance_metadata_tags
   }
 
   tags = merge(
