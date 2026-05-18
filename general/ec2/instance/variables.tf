@@ -123,3 +123,18 @@ variable "delete_on_termination" {
   description = "(Optional) Whether the volume should be destroyed on instance termination. Defaults to true."
   default     = true
 }
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) Metadata options for the EC2 instance. Set to null to disable. See: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance#metadata-options"
+  default = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  }
+}
