@@ -123,3 +123,21 @@ variable "delete_on_termination" {
   description = "(Optional) Whether the volume should be destroyed on instance termination. Defaults to true."
   default     = true
 }
+
+variable "enable_metadata_options" {
+  type        = bool
+  description = "When false, the metadata_options nested block is not declared on aws_instance (use if your Terraform/provider setup rejects this block)."
+  default     = true
+}
+
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string)
+    http_tokens                 = optional(string)
+    http_put_response_hop_limit = optional(number)
+    instance_metadata_tags      = optional(string)
+  })
+  description = "Optional overrides for aws_instance metadata_options; unset keys use the module defaults (IMDSv2 required, metadata tags enabled)."
+  default     = {}
+  nullable    = false
+}
