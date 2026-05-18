@@ -12,11 +12,15 @@ resource "aws_instance" "this" {
   user_data                   = var.user_data
   iam_instance_profile        = var.iam_profile
 
-  metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 1
-    instance_metadata_tags      = "enabled"
+  dynamic "metadata_options" {
+    for_each = var.metadata_options != null ? [var.metadata_options] : []
+
+    content {
+      http_endpoint               = metadata_options.value.http_endpoint
+      http_tokens                 = metadata_options.value.http_tokens
+      http_put_response_hop_limit = metadata_options.value.http_put_response_hop_limit
+      instance_metadata_tags      = metadata_options.value.instance_metadata_tags
+    }
   }
 
   tags = merge(
@@ -26,10 +30,10 @@ resource "aws_instance" "this" {
       Description = var.ec2_description
     }
   )
+
   # Important: Modifying any of the root_block_device settings other than volume_size or
   # tags requires resource replacement.
   # Doc: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance#ebs-ephemeral-and-root-block-devices
-
   root_block_device {
     delete_on_termination = var.delete_on_termination
     encrypted             = var.encrypted
@@ -44,5 +48,4 @@ resource "aws_instance" "this" {
       }
     )
   }
-
 }

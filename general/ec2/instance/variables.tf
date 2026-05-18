@@ -123,3 +123,14 @@ variable "delete_on_termination" {
   description = "(Optional) Whether the volume should be destroyed on instance termination. Defaults to true."
   default     = true
 }
+
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) Metadata options for the EC2 instance (IMDSv2 configuration). Set to null to omit the block entirely for compatibility with older provider versions."
+  default     = null
+}
