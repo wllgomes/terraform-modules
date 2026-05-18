@@ -19,13 +19,17 @@ This is a simple sample, with minimum necessary options. Please read and change 
 
 ```bash
 module "Sample" {
-  source = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/s3"
+  source = "git::https://github.com/wllgomes/terraform-modules.git//general/s3?ref=main"
   bucket_name        = "" # Required
   bucket_description = "" # Required
   kms_master_key_id  = "" # Required
   default_tags       = {} # Required
 }
 ```
+
+For compatibility with old consumers that still use the historical `modules/s3`
+path, this repository also exposes `git::https://github.com/wllgomes/terraform-modules.git//modules/s3?ref=main`
+as a wrapper around this module.
 <br>
 
 ## References

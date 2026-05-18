@@ -18,7 +18,7 @@ For usage the "terraform modules" stored here, follow this **sample** below:
 
 ```
 module "Sample" {
-  "source = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/MODULE-NAME-HERE"
+  source = "git::https://github.com/wllgomes/terraform-modules.git//general/MODULE-NAME-HERE?ref=main"
   [options module]
 }
 ```
