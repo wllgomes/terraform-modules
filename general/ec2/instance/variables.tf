@@ -108,6 +108,43 @@ variable "iam_profile" {
   description = "Profile IAM (Role)"
   default     = ""
 }
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    http_protocol_ipv6          = optional(string)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) Metadata options for the EC2 instance. Defaults enforce IMDSv2 and enable instance metadata tags."
+  default     = {}
+  nullable    = false
+
+  validation {
+    condition     = contains(["enabled", "disabled"], var.metadata_options.http_endpoint)
+    error_message = "metadata_options.http_endpoint must be enabled or disabled."
+  }
+
+  validation {
+    condition     = contains(["optional", "required"], var.metadata_options.http_tokens)
+    error_message = "metadata_options.http_tokens must be optional or required."
+  }
+
+  validation {
+    condition     = var.metadata_options.http_put_response_hop_limit >= 1 && var.metadata_options.http_put_response_hop_limit <= 64
+    error_message = "metadata_options.http_put_response_hop_limit must be between 1 and 64."
+  }
+
+  validation {
+    condition     = var.metadata_options.http_protocol_ipv6 == null || contains(["enabled", "disabled"], var.metadata_options.http_protocol_ipv6)
+    error_message = "metadata_options.http_protocol_ipv6 must be enabled or disabled."
+  }
+
+  validation {
+    condition     = contains(["enabled", "disabled"], var.metadata_options.instance_metadata_tags)
+    error_message = "metadata_options.instance_metadata_tags must be enabled or disabled."
+  }
+}
 variable "encrypted" {
   type        = bool
   description = "(Optional) Whether to enable volume encryption. Defaults to false."
