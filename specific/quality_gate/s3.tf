@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "allow_matheus_put_object_input_jsons" {
 }
 
 module "S3TerraformQualityGateCommunications" {
-  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/s3"
+  source             = "../../general/s3"
   bucket_name        = "${local.vertical_initials}-s3-${local.environment}-quality-gate-communications"
   bucket_description = "Bucket for store file of QualityGate ${local.vertical_initials}-${local.environment}"
   default_tags       = local.common_tags
@@ -63,7 +63,7 @@ module "S3TerraformQualityGateCommunications" {
 }
 
 module "S3TerraformQualityGateRecords" {
-  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/s3"
+  source             = "../../general/s3"
   bucket_name        = "${local.vertical_initials}-s3-${local.environment}-quality-gate-records"
   bucket_description = "Bucket for store file of QualityGate ${local.vertical_initials}-${local.environment}"
   default_tags       = local.common_tags
@@ -72,7 +72,7 @@ module "S3TerraformQualityGateRecords" {
 }
 
 module "S3TerraformQualityGateInputJsons" {
-  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/s3"
+  source             = "../../general/s3"
   bucket_name        = "${local.vertical_initials}-s3-${local.environment}-quality-gate-input-jsons"
   bucket_description = "Bucket for store file of QualityGate ${local.vertical_initials}-${local.environment}"
   default_tags       = local.common_tags
