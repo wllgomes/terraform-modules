@@ -123,3 +123,34 @@ variable "delete_on_termination" {
   description = "(Optional) Whether the volume should be destroyed on instance termination. Defaults to true."
   default     = true
 }
+
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) Customize Instance Metadata Service (IMDS) options."
+  default     = {}
+
+  validation {
+    condition     = contains(["enabled", "disabled"], var.metadata_options.http_endpoint)
+    error_message = "metadata_options.http_endpoint must be either enabled or disabled."
+  }
+
+  validation {
+    condition     = contains(["optional", "required"], var.metadata_options.http_tokens)
+    error_message = "metadata_options.http_tokens must be either optional or required."
+  }
+
+  validation {
+    condition     = var.metadata_options.http_put_response_hop_limit >= 1 && var.metadata_options.http_put_response_hop_limit <= 64
+    error_message = "metadata_options.http_put_response_hop_limit must be between 1 and 64."
+  }
+
+  validation {
+    condition     = contains(["enabled", "disabled"], var.metadata_options.instance_metadata_tags)
+    error_message = "metadata_options.instance_metadata_tags must be either enabled or disabled."
+  }
+}
