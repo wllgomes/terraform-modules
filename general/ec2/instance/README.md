@@ -28,6 +28,30 @@ module "SampleEC2" {
 ```
 <br>
 
+### Customizing metadata_options
+The `metadata_options` block is optional. When omitted, the module uses secure defaults
+(`http_endpoint = "enabled"`, `http_tokens = "required"`, `http_put_response_hop_limit = 1`,
+`instance_metadata_tags = "enabled"`). Any subset of fields can be overridden:
+```bash
+module "SampleEC2" {
+  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/ec2/instance"
+  ec2_name           = ""
+  ami                = ""
+  instance_type      = ""
+  security_group_ids = []
+  subnet_id          = ""
+  volume_size        = 30
+
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 2
+    instance_metadata_tags      = "enabled"
+  }
+}
+```
+<br>
+
 ## References
 - https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance
 <br>

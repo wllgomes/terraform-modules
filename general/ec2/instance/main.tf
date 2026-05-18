@@ -13,10 +13,10 @@ resource "aws_instance" "this" {
   iam_instance_profile        = var.iam_profile
 
   metadata_options {
-    http_endpoint               = "enabled"
-    http_tokens                 = "required"
-    http_put_response_hop_limit = 1
-    instance_metadata_tags      = "enabled"
+    http_endpoint               = var.metadata_options.http_endpoint
+    http_tokens                 = var.metadata_options.http_tokens
+    http_put_response_hop_limit = var.metadata_options.http_put_response_hop_limit
+    instance_metadata_tags      = var.metadata_options.instance_metadata_tags
   }
 
   tags = merge(
