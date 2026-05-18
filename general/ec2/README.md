@@ -18,17 +18,23 @@ This is a simple sample, with minimum necessary options. Please read and change 
 * Instances
 ```bash
 module "SampleEC2" {
-  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/ec2/instances"
+  source             = "git::https://gitlab.com/phconsultoria/phconsultoria-tfm.git//modules/ec2/instance"
   ec2_name           = "" # Required
   ec2_description    = "" # Required
   ami                = "" # Required
-  ec2_type           = "" # Required
+  instance_type      = "" # Required
   key_name           = "" # Required
   security_group_ids = "" # Required
   subnet_id          = "" # Required
   volume_size        = "" # Required
   kms_key_id         = "" # Required
   default_tags       = {} # Required
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+    instance_metadata_tags      = "enabled"
+  } # Optional
 }
 ```
 * DLM
