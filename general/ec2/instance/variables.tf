@@ -98,6 +98,16 @@ variable "source_dest" {
   description = "(Optional) Controls if traffic is routed to the instance when the destination address does not match the instance. Used for NAT or VPNs. Defaults true."
   default     = true
 }
+variable "metadata_options" {
+  type = object({
+    http_endpoint               = optional(string, "enabled")
+    http_tokens                 = optional(string, "required")
+    http_put_response_hop_limit = optional(number, 1)
+    instance_metadata_tags      = optional(string, "enabled")
+  })
+  description = "(Optional) Metadata service configuration for the EC2 instance (IMDS)."
+  default     = {}
+}
 variable "volume_type" {
   type        = string
   description = "Volume type"
